@@ -1,0 +1,107 @@
+### 0. Walkthrough: Alice, Bob, Carol, Dan -> all on elevator 0, avg wait 2.0, avg total 6.75, lastTick 15
+POST http://localhost:8080/api/simulations
+Content-Type: application/json
+
+{
+  "elevators": 2,
+  "floors": 10,
+  "capacity": 4,
+  "requests": [
+    {"time": 0, "id": "Alice", "source": 1, "dest": 8},
+    {"time": 0, "id": "Bob",   "source": 1, "dest": 5},
+    {"time": 3, "id": "Carol", "source": 7, "dest": 2},
+    {"time": 4, "id": "Dan",   "source": 6, "dest": 9}
+  ]
+}
+
+### 1. Brief sample, 2 cars -> passenger3 goes to car 1 (pickup 29, drop-off 48), avg total 41.33
+POST http://localhost:8080/api/simulations
+Content-Type: application/json
+
+{
+  "elevators": 2,
+  "floors": 51,
+  "capacity": 10,
+  "requests": [
+    {"time": 0,  "id": "passenger1", "source": 1,  "dest": 51},
+    {"time": 0,  "id": "passenger2", "source": 1,  "dest": 37},
+    {"time": 10, "id": "passenger3", "source": 20, "dest": 1}
+  ]
+}
+
+### 2. Same requests, 1 car -> passenger3 waits 71 ticks, avg total 58.67
+POST http://localhost:8080/api/simulations
+Content-Type: application/json
+
+{
+  "elevators": 1,
+  "floors": 51,
+  "capacity": 10,
+  "requests": [
+    {"time": 0,  "id": "passenger1", "source": 1,  "dest": 51},
+    {"time": 0,  "id": "passenger2", "source": 1,  "dest": 37},
+    {"time": 10, "id": "passenger3", "source": 20, "dest": 1}
+  ]
+}
+
+### 3. Compare all three schedulers on the same requests
+POST http://localhost:8080/api/simulations/compare
+Content-Type: application/json
+
+{
+  "elevators": 2,
+  "floors": 20,
+  "capacity": 4,
+  "requests": [
+    {"time": 0, "id": "a", "source": 1,  "dest": 15},
+    {"time": 0, "id": "b", "source": 1,  "dest": 9},
+    {"time": 1, "id": "c", "source": 12, "dest": 1},
+    {"time": 2, "id": "d", "source": 5,  "dest": 18},
+    {"time": 3, "id": "e", "source": 20, "dest": 2},
+    {"time": 4, "id": "f", "source": 1,  "dest": 6},
+    {"time": 6, "id": "g", "source": 8,  "dest": 1},
+    {"time": 9, "id": "h", "source": 3,  "dest": 14}
+  ]
+}
+
+### 4. Pick a scheduler explicitly (DISPATCH or NEAREST_CAR)
+POST http://localhost:8080/api/simulations
+Content-Type: application/json
+
+{
+  "elevators": 2,
+  "floors": 51,
+  "capacity": 10,
+  "scheduler": "NEAREST_CAR",
+  "requests": [
+    {"time": 0,  "id": "passenger1", "source": 1,  "dest": 51},
+    {"time": 0,  "id": "passenger2", "source": 1,  "dest": 37},
+    {"time": 10, "id": "passenger3", "source": 20, "dest": 1}
+  ]
+}
+
+### 5. Error case: floor 99 is outside a 51-floor building -> 400 naming passenger1
+POST http://localhost:8080/api/simulations
+Content-Type: application/json
+
+{
+  "elevators": 2,
+  "floors": 51,
+  "capacity": 10,
+  "requests": [
+    {"time": 0, "id": "passenger1", "source": 1, "dest": 99}
+  ]
+}
+
+### 6. Error case: 11 elevators -> 400
+POST http://localhost:8080/api/simulations
+Content-Type: application/json
+
+{
+  "elevators": 11,
+  "floors": 20,
+  "capacity": 8,
+  "requests": [
+    {"time": 0, "id": "a", "source": 1, "dest": 5}
+  ]
+}
